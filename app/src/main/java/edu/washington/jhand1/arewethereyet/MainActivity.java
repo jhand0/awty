@@ -27,6 +27,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startPressed = false;
+        interval = -1;
         EditText phone = (EditText) findViewById(R.id.edtPhone);
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
@@ -72,7 +73,11 @@ public class MainActivity extends Activity {
 
         this.message = message.getText().toString();
         this.phoneNumber = phoneNumber.getText().toString();
-        this.interval = Integer.parseInt(minutes.getText().toString()) * 60000;
+        try {
+            this.interval = Integer.parseInt(minutes.getText().toString()) * 60000;
+        } catch (NumberFormatException e) {
+            this.interval = -1;
+        }
 
     }
 
