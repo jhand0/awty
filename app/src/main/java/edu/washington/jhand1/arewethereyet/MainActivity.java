@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,9 +27,18 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         startPressed = false;
+        EditText phone = (EditText) findViewById(R.id.edtPhone);
+        phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
         am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        receiveAlarms();
+        BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(MainActivity.this, phoneNumber + ": " + message,
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+        registerReceiver(alarmReceiver, new IntentFilter("edu.washington.jhand1.alarmsOnly"));
 
         Intent i = new Intent();
         i.setAction("edu.washington.jhand1.alarmsOnly");
@@ -40,10 +50,12 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 if (!startPressed) {
                     getUserInput();
-                    am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() - interval,
-                            interval, pi);
-                    start.setText("Stop");
-                    startPressed = !startPressed;
+                    if (message != null && phoneNumber != null && interval > 0) {
+                        am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() - interval,
+                                interval, pi);
+                        start.setText("Stop");
+                        startPressed = !startPressed;
+                    }
                 } else {
                     start.setText("Start");
                     startPressed = !startPressed;
@@ -51,17 +63,6 @@ public class MainActivity extends Activity {
                 }
             }
         });
-    }
-
-    private void receiveAlarms() {
-        BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Toast.makeText(MainActivity.this, phoneNumber + ": " + message,
-                        Toast.LENGTH_SHORT).show();
-            }
-        };
-        registerReceiver(alarmReceiver, new IntentFilter("edu.washington.jhand1.alarmsOnly"));
     }
 
     private void getUserInput() {
