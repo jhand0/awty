@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,17 +18,20 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private boolean startPressed; //determines whether alarm is currently on or off
     private AlarmManager am;
-    private PendingIntent pi;
+    private PendingIntent alarmIntent;
     private int interval; //milliseconds between messages
-    private String message;
+    private String message; //message user would like to send
     private String phoneNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("MainActivity", "onCreate fired");
         setContentView(R.layout.activity_main);
         startPressed = false;
         interval = -1;
+
+        //auto-formats phone number for the user as they type
         EditText phone = (EditText) findViewById(R.id.edtPhone);
         phone.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
@@ -39,11 +43,13 @@ public class MainActivity extends Activity {
                         Toast.LENGTH_SHORT).show();
             }
         };
+
+        //registers BroadcastReceiver and adds filter so only alarm intent is received
         registerReceiver(alarmReceiver, new IntentFilter("edu.washington.jhand1.alarmsOnly"));
 
         Intent i = new Intent();
-        i.setAction("edu.washington.jhand1.alarmsOnly");
-        pi = PendingIntent.getBroadcast(this, 0, i, 0);
+        i.setAction("edu.washington.jhand1.alarmsOnly"); //sets type of intent (alarm intent)
+        alarmIntent = PendingIntent.getBroadcast(this, 0, i, 0);
 
         final Button start = (Button) findViewById(R.id.btnStart);
         start.setOnClickListener(new View.OnClickListener() {
@@ -53,14 +59,14 @@ public class MainActivity extends Activity {
                     getUserInput();
                     if (message != null && phoneNumber != null && interval > 0) {
                         am.setRepeating(AlarmManager.RTC, System.currentTimeMillis() - interval,
-                                interval, pi);
+                                interval, alarmIntent);
                         start.setText("Stop");
                         startPressed = !startPressed;
                     }
                 } else {
                     start.setText("Start");
                     startPressed = !startPressed;
-                    am.cancel(pi);
+                    am.cancel(alarmIntent);
                 }
             }
         });
@@ -84,8 +90,9 @@ public class MainActivity extends Activity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        am.cancel(pi);
-        pi.cancel();
+        Log.i("MainActivity", "onDestroy Fired");
+        am.cancel(alarmIntent);
+        alarmIntent.cancel();
     }
 
 }
