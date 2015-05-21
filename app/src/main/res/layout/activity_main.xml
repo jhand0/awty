@@ -20,7 +20,8 @@
                 android:text="Message:"
                 android:textSize="15sp"
                 android:textColor="#ff000000"
-                android:layout_column="0" />
+                android:layout_column="0"
+                android:textIsSelectable="true"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -29,7 +30,8 @@
                 android:ems="10"
                 android:id="@+id/edtMessage"
                 android:layout_weight="1"
-                android:layout_column="1" />
+                android:layout_column="1"
+                android:textIsSelectable="true"/>
         </TableRow>
 
         <TableRow
@@ -40,7 +42,8 @@
                 android:layout_height="wrap_content"
                 android:text="Phone #:"
                 android:textSize="15sp"
-                android:textColor="#ff000000" />
+                android:textColor="#ff000000"
+                android:textIsSelectable="true"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -48,7 +51,8 @@
                 android:inputType="phone"
                 android:ems="10"
                 android:id="@+id/edtPhone"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textIsSelectable="true"/>
         </TableRow>
         <TableRow
             android:layout_height="wrap_content"
@@ -58,7 +62,8 @@
                 android:layout_height="wrap_content"
                 android:text="Minutes:"
                 android:textSize="15sp"
-                android:textColor="#ff000000" />
+                android:textColor="#ff000000"
+                android:textIsSelectable="true"/>
 
             <EditText
                 android:layout_width="wrap_content"
@@ -66,7 +71,8 @@
                 android:inputType="phone"
                 android:ems="10"
                 android:id="@+id/edtMinutes"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textIsSelectable="true"/>
         </TableRow>
     </TableLayout>
 
