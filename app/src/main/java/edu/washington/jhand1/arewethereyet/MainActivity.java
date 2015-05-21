@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.PhoneNumberUtils;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -39,8 +41,19 @@ public class MainActivity extends Activity {
         BroadcastReceiver alarmReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Toast.makeText(MainActivity.this, phoneNumber + ": " + message,
-                        Toast.LENGTH_SHORT).show();
+                try {
+                    phoneNumber = phoneToDialable(phoneNumber);
+                    SmsManager smsManager = SmsManager.getDefault();
+                    Log.i("MainActivity", phoneNumber);
+                    smsManager.sendTextMessage(phoneNumber, null, message, null, null);
+                    Toast.makeText(getApplicationContext(), "SMS Sent!",
+                            Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(),
+                            "Message could not send, please try again later!",
+                            Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -72,6 +85,16 @@ public class MainActivity extends Activity {
         });
     }
 
+    public String phoneToDialable(String phone) {
+        String dialablePhone = "";
+        for (int i = 0; i < phone.length(); i++) {
+            if (PhoneNumberUtils.is12Key(phone.charAt(i))) {
+                dialablePhone += phone.charAt(i);
+            }
+        }
+        return dialablePhone;
+    }
+
     private void getUserInput() {
         EditText message = (EditText) findViewById(R.id.edtMessage);
         EditText phoneNumber = (EditText) findViewById(R.id.edtPhone);
@@ -84,7 +107,6 @@ public class MainActivity extends Activity {
         } catch (NumberFormatException e) {
             this.interval = -1;
         }
-
     }
 
     @Override
